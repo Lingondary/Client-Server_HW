@@ -1,5 +1,11 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.Pipe;
+import java.util.ArrayList;
 
 public class Client extends JFrame {
     private static final int WIDTH = 400;
@@ -18,7 +24,9 @@ public class Client extends JFrame {
     private final JTextField tfMessage = new JTextField();
     private final JButton btnSend = new JButton("Send");
 
-    Client(){
+    private boolean isConnectedToServer = false;
+
+    Client(Server server){
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setSize(WIDTH,HEIGHT);
@@ -39,11 +47,83 @@ public class Client extends JFrame {
         JScrollPane scrollLog = new JScrollPane(log);
         add(scrollLog);
 
+        tfMessage.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendMessage(server);
+            }
+        });
+
+        btnSend.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendMessage(server);
+            }
+        });
+
         setVisible(true);
+
+        new Thread(new ServerChecker(server)).start();
+        startScrollLogUpdater(server.history);
     }
 
-    public static void main(String[] args) {
-        new Client();
-        new Client();
+    private void startScrollLogUpdater(ArrayList<String> history) {
+        new Thread(() -> {
+            while (true) {
+                try {
+                    // Вызываем метод обновления scrollLog
+                    updateScrollLog(history);
+                    // Ждем 2 секунды перед следующим вызовом
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    private void updateScrollLog(ArrayList<String> history) {
+        // Получаем текст из JTextArea
+        String currentText = log.getText();
+        // Разбиваем текст на строки
+        String[] currentLines = currentText.split("\n");
+
+        // Проходимся по истории и добавляем только те строки, которых нет в текущем тексте
+        for (String line : history) {
+            if (!currentText.contains(line)) {
+                // Обновляем текст в JTextArea в главном потоке событий
+                SwingUtilities.invokeLater(() -> log.append(line + "\n"));
+            }
+        }
+    }
+
+
+
+    private void sendMessage(Server server) {
+        String message = tfMessage.getText();
+        server.gotMessage(tfLogin.getText()+ ':' + message);
+        tfMessage.setText(""); // Очистка текстового поля после отправки
+    }
+
+    private class ServerChecker implements Runnable {
+        private final Server server;
+
+        ServerChecker(Server server) {
+            this.server = server;
+        }
+
+        @Override
+        public void run() {
+            // Периодическая проверка переменной server.isServerWorking
+            while (!server.isServerWorking) {
+                try {
+                    Thread.sleep(2000); // Пауза в 2 секунды
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            // Если сервер работает, устанавливаем isConnectedToServer в true
+            isConnectedToServer = true;
+        }
     }
 }
