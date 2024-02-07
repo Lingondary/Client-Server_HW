@@ -62,12 +62,10 @@ public class Server extends JFrame{
         try (BufferedReader reader = new BufferedReader(new FileReader("log.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                history.add(line); // читаем строки из файла и добавляем в список
+                history.add(line);
             }
-            // здесь можно обработать полученные строки, например, вывести их на экран или сохранить в памяти
         } catch (IOException e) {
             e.printStackTrace();
-            // В случае ошибки при чтении файла выводим стек вызовов
         }
     }
 }

@@ -71,9 +71,7 @@ public class Client extends JFrame {
         new Thread(() -> {
             while (true) {
                 try {
-                    // Вызываем метод обновления scrollLog
                     updateScrollLog(history);
-                    // Ждем 2 секунды перед следующим вызовом
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -83,15 +81,11 @@ public class Client extends JFrame {
     }
 
     private void updateScrollLog(ArrayList<String> history) {
-        // Получаем текст из JTextArea
         String currentText = log.getText();
-        // Разбиваем текст на строки
         String[] currentLines = currentText.split("\n");
 
-        // Проходимся по истории и добавляем только те строки, которых нет в текущем тексте
         for (String line : history) {
             if (!currentText.contains(line)) {
-                // Обновляем текст в JTextArea в главном потоке событий
                 SwingUtilities.invokeLater(() -> log.append(line + "\n"));
             }
         }
@@ -102,7 +96,7 @@ public class Client extends JFrame {
     private void sendMessage(Server server) {
         String message = tfMessage.getText();
         server.gotMessage(tfLogin.getText()+ ':' + message);
-        tfMessage.setText(""); // Очистка текстового поля после отправки
+        tfMessage.setText("");
     }
 
     private class ServerChecker implements Runnable {
@@ -114,15 +108,13 @@ public class Client extends JFrame {
 
         @Override
         public void run() {
-            // Периодическая проверка переменной server.isServerWorking
             while (!server.isServerWorking) {
                 try {
-                    Thread.sleep(2000); // Пауза в 2 секунды
+                    Thread.sleep(2000)
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            // Если сервер работает, устанавливаем isConnectedToServer в true
             isConnectedToServer = true;
         }
     }
