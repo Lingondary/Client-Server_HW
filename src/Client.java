@@ -110,7 +110,7 @@ public class Client extends JFrame {
         public void run() {
             while (!server.isServerWorking) {
                 try {
-                    Thread.sleep(2000)
+                    Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
