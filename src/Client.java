@@ -1,10 +1,9 @@
+import Server.Server;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.Pipe;
 import java.util.ArrayList;
 
 public class Client extends JFrame {

@@ -1,3 +1,5 @@
+package Server;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -5,7 +7,7 @@ import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.ArrayList;
 
-public class Server extends JFrame{
+public class Server extends JFrame implements ServerInterface{
     private static final int POS_X = 500;
     private static final int POS_Y = 550;
     private static final int WIDTH = 550;
@@ -16,7 +18,7 @@ public class Server extends JFrame{
     public boolean isServerWorking;
 
     ArrayList<String> history = new ArrayList<>();
-    Server(){
+    public Server(){
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setBounds(POS_X, POS_Y, WIDTH, HEIGHT);
         setResizable(false);
@@ -34,7 +36,7 @@ public class Server extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 isServerWorking = false;
-                System.out.println("Server stopped.");
+                System.out.println("Server.Server stopped.");
             }
         });
 
@@ -43,7 +45,7 @@ public class Server extends JFrame{
             @Override
             public void actionPerformed(ActionEvent e) {
                 isServerWorking = true;
-                System.out.println("Server started.");
+                System.out.println("Server.Server started.");
                 getHistory();
             }
         });
@@ -67,5 +69,30 @@ public class Server extends JFrame{
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void startServer() {
+        isServerWorking = true;
+        System.out.println("Server started.");
+        getHistory();
+    }
+
+    @Override
+    public void stopServer() {
+        isServerWorking = false;
+        System.out.println("Server stopped.");
+    }
+
+    @Override
+    public void sendMessage(String message) {
+        // Метод для отправки сообщения серверу
+        gotMessage(message);
+    }
+
+    @Override
+    public ArrayList<String> getMessageHistory() {
+        // Метод для получения истории сообщений с сервера
+        return new ArrayList<>(history);
     }
 }
